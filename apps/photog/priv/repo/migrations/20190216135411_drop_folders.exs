@@ -3,9 +3,13 @@ defmodule Photog.Repo.Migrations.DropFolders do
 
   def change do
   	alter table(:albums) do
-	  remove :folder_order
-	  remove :folder_id
-	end
+			remove :folder_order
+			remove :folder_id
+		end
+
+		alter table(:bookmarks) do
+			remove :folder_id
+		end
 
   	drop table(:folders)
   end
