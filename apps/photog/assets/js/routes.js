@@ -12,6 +12,7 @@ import ImportForm from './components/import-form.vue';
 import Home from './components/home.vue';
 import Slideshow from './components/slideshow.vue';
 import ListPage from './components/list-page.vue';
+import YearsListPage from './components/years-list-page.vue';
 import ImagesSearch from './components/images-search.vue';
 
 export default {
@@ -173,22 +174,7 @@ export default {
         {
             path: '/albums/years',
             name: 'albumsForYearIndex',
-            component: ListPage,
-            props(route){
-                const getItems = (getModel) => getModel('/albums/years/index').then(years => 
-                    Promise.resolve(years.map(year => ({
-                        title: year,
-                        route: {
-                            name: 'albumsForYear',
-                            params: { year }
-                        },
-                    }))));
-
-                return {
-                    title: 'Albums for Year',
-                    getItems,
-                };
-            },
+            component: YearsListPage,
         },
         buildAlbumVariant('/albums/favorites', 'albumFavoritesIndex', (route) => {
             const props = {
@@ -450,6 +436,16 @@ export default {
             path: '/images/:id',
             name: 'imagesShow', 
             component: ImageDetail,
+            props: (route) => {
+                return {
+                    imageId: parseInt(route.params.id),
+                }; 
+            },
+        },
+        { 
+            path: '/images/:id/editor',
+            name: 'imagesEditor', 
+            component: () => import( /* webpackChunkName: "image-editor" */ './components/image-editor/components/image-editor-page.vue'),
             props: (route) => {
                 return {
                     imageId: parseInt(route.params.id),

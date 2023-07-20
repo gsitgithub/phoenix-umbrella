@@ -46,7 +46,7 @@ defmodule PhotogWeb.Router do
     get "/images/years/:year/count",          ImageController, :images_for_year_count
 
     # Albums
-    get "/albums/years/index",                AlbumController, :albums_years_list
+    get "/albums/years/index",                YearController, :albums_years_list
     get "/albums/years/:year",                AlbumController, :albums_for_year
     get "/albums/years/:year/count",          AlbumController, :albums_for_year_count
 
@@ -73,6 +73,10 @@ defmodule PhotogWeb.Router do
     # Edit person images
     post "/images/:id/persons",               ImageController, :add_persons
     delete "/persons/:id/images",             PersonController, :remove_images_from_person
+
+    # Album years
+    delete "/years/:year",                    YearController, :delete
+    put "/years/:id",                        YearController, :put
   end
 
   scope "/", PhotogWeb do

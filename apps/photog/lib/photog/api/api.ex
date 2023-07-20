@@ -14,6 +14,7 @@ defmodule Photog.Api do
   alias Photog.Api.Import
   alias Photog.Api.Tag
   alias Photog.Api.AlbumTag
+  alias Photog.Api.Year
 
   @doc """
   Preloads image import
@@ -394,11 +395,22 @@ defmodule Photog.Api do
   Returns the string list of years where there are albums
   """
   def distinct_album_years do
-    from(
+    years_query = from(
       album in Album,
-      distinct: [desc: :year],
+      left_join: year in Year,
+      on: album.year == year.id,
+      group_by: [album.year],
       order_by: [desc: :year],
-      select: album.year
+      select: %{year: album.year, count: count()}
+    )
+
+    from(
+      year in Year,
+      right_join: year_aggregate in subquery(years_query),
+      on: year.id == year_aggregate.year,
+      left_join: image in assoc(year, :cover_image),
+      order_by: [desc: year_aggregate.year],
+      select: %{year: year_aggregate.year, count: year_aggregate.count, description: year.description, mini_thumbnail_path: image.mini_thumbnail_path, cover_image_id: year.cover_image_id}
     )
     |> Repo.all
   end
@@ -1468,6 +1480,23 @@ defmodule Photog.Api do
   """
   def change_album_tag(%AlbumTag{} = album_tag) do
     AlbumTag.changeset(album_tag, %{})
+  end
+
+  @doc """
+  Updates a year or creates it if it doesn't exist.
+  """
+  def upsert_year(%{"id" => _id, "description" => description, "cover_image_id" => cover_image_id} = attrs) do
+    %Year{}
+    |> Year.changeset(attrs)
+    |> Repo.insert(on_conflict: [set: [description: description, cover_image_id: cover_image_id]], conflict_target: :id)
+  end
+
+  @doc """
+  Deletes a given year.
+  """
+  def delete_year(year) do
+    from(year in Year, where: year.id == ^year)
+    |> Repo.delete_all
   end
 
 end
