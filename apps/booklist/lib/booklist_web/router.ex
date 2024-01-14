@@ -49,6 +49,8 @@ defmodule BooklistWeb.Router do
     get "/", ReportsController, :index
     get "/years/:year", ReportsController, :years_show
     get "/authors", ReportsController, :authors_index
+    get "/genres", ReportsController, :genres_index
+    get "/reread-books", ReportsController, :reread_books_index
   end
 
   # Other scopes may use custom stacks.

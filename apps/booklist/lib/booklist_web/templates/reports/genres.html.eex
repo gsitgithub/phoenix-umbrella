@@ -1,24 +1,26 @@
-<h2>Authors Report</h2>
+<h2>Genres Report</h2>
+
+<p>Total books read: <%= @total_ratings_count %></p>
 
 <table class="reporting_top_rated_books_table">
     <tr>
         <th></th>
-        <th class="reporting_top_rated_books_table__author">Author</th>
+        <th class="reporting_top_rated_books_table__author">Genre</th>
         <th class="reporting_top_rated_books_table__count">Count</th>
-        <th>Average</th>
+        <th>Percentage</th>
     </tr>
     <tbody>
-        <%= for %{author: author, ratings_count: ratings_count, ratings_average: ratings_average} <- @authors do %>
+        <%= for %{genre: genre, ratings_count: ratings_count} <- @genres do %>
             <tr>
                 <td class="reporting_top_rated_books_table__index"></td>
                 <td>
-                    <%= link(BooklistWeb.AuthorView.to_s(author), to: Routes.author_path(@conn, :show, author)) %>
+                    <%= link(BooklistWeb.GenreView.to_s(genre), to: Routes.genre_path(@conn, :show, genre)) %>
                 </td>
                 <td>
                     <%= ratings_count %>
                 </td>
                 <td>
-                    <%= ratings_average %>
+                    <%= ratings_count / @total_ratings_count * 100 |> Decimal.from_float() |> Decimal.round(2) %>%
                 </td>
             </tr>
         <% end %>

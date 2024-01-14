@@ -9,6 +9,7 @@ defmodule Booklist.Reports do
   alias Booklist.Admin.Rating
   alias Booklist.Admin.Genre
   alias Booklist.Admin.Author
+  alias Booklist.Admin.Book
 
   def increment(num) do
     num + 1
@@ -24,7 +25,7 @@ defmodule Booklist.Reports do
   def get_ratings(year) do
     from(
       r in Rating, 
-      left_join: book in assoc(r, :book), 
+      join: book in assoc(r, :book), 
       where: fragment("EXTRACT(year FROM ?)", r.date_scored) == ^year, 
       order_by: [desc: r.score, desc: r.id],
       select: %{
@@ -117,43 +118,49 @@ defmodule Booklist.Reports do
   """
   def list_authors do
     from(
-      author in Author,
-      join: book in assoc(author, :books),
-      join: rating in assoc(book, :ratings),
-      preload: [books: {book, [ratings: rating]}],
-      order_by: [author.last_name, author.first_name, author.middle_name]
+      rating in Rating,
+      join: book in assoc(rating, :book),
+      join: author in assoc(book, :author),
+      group_by: [author.id, author.first_name, author.middle_name, author.last_name],
+      order_by: [desc: fragment("ratings_count"), desc: fragment("ratings_average")],
+      select: 
+        %{
+          ratings_count: fragment("count(*) as ratings_count"),
+          ratings_average: fragment("round(avg(?), 2) as ratings_average", rating.score),
+          author: 
+            %Author{id: author.id, first_name: author.first_name, middle_name: author.middle_name, last_name: author.last_name}
+      }
     )
     |> Repo.all()
   end
 
   @doc """
-  Returns the list of authors with calculated sum of ratings
-
-  ## Examples
-
-      iex> calculate_authors_average_score()
-      [{ %Author{}, ratings_count, average_score }]
-
+  Returns the list of books that have been read more than once.
   """
-  def calculate_authors_average_score(authors) do
-    authors
-    |> Enum.map(fn (author) -> 
-        ratings = Enum.flat_map(author.books, fn (book) -> book.ratings end)
-        ratings_count = Enum.count(ratings)
-        
-        ratings_sum = ratings
-        |> Enum.reduce(0, fn (rating, sum) -> rating.score + sum end)
+  def list_reread_books do
+    from(
+      rating in Rating,
+      join: book in assoc(rating, :book),
+      group_by: [book.id, book.title, book.sort_title, book.subtitle],
+      order_by: [fragment("ratings_count"), book.sort_title],
+      having: count() > 1,
+      select: %{ratings_count: fragment("count(*) as ratings_count"), book: %Book{id: book.id, title: book.title, sort_title: book.sort_title, subtitle: book.subtitle}}
+    )
+    |> Repo.all()
+  end
 
-        ratings_average = ratings_sum / ratings_count
-
-        {author, ratings_count, ratings_average}
-    end)
-    |> Enum.sort(fn ({_author_1, ratings_count_1, ratings_average_1}, {_author_2, ratings_count_2, ratings_average_2}) -> 
-      cond do
-        ratings_count_1 == ratings_count_2 -> ratings_average_1 >= ratings_average_2
-        ratings_count_1 >= ratings_count_2 -> true
-        true -> false
-      end
-    end)
+  @doc """
+  Returns the list of genres with the list of ratings
+  """
+  def list_genres_with_ratings_count do
+    from(
+      rating in Rating,
+      join: book in assoc(rating, :book),
+      join: genre in assoc(book, :genre),
+      group_by: [genre.id, genre.name],
+      order_by: [genre.name],
+      select: %{ratings_count: fragment("count(*) as ratings_count"), genre: %Genre{id: genre.id, name: genre.name}}
+    )
+    |> Repo.all()
   end
 end

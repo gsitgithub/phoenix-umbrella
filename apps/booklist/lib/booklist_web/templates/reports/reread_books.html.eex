@@ -1,24 +1,20 @@
-<h2>Authors Report</h2>
+<h2>Re-read Books Report</h2>
 
 <table class="reporting_top_rated_books_table">
     <tr>
         <th></th>
-        <th class="reporting_top_rated_books_table__author">Author</th>
+        <th class="reporting_top_rated_books_table__author">Book</th>
         <th class="reporting_top_rated_books_table__count">Count</th>
-        <th>Average</th>
     </tr>
     <tbody>
-        <%= for %{author: author, ratings_count: ratings_count, ratings_average: ratings_average} <- @authors do %>
+        <%= for %{book: book, ratings_count: ratings_count} <- @books do %>
             <tr>
                 <td class="reporting_top_rated_books_table__index"></td>
                 <td>
-                    <%= link(BooklistWeb.AuthorView.to_s(author), to: Routes.author_path(@conn, :show, author)) %>
+                    <%= link(BooklistWeb.BookView.to_s(book), to: Routes.book_path(@conn, :show, book)) %>
                 </td>
                 <td>
                     <%= ratings_count %>
-                </td>
-                <td>
-                    <%= ratings_average %>
                 </td>
             </tr>
         <% end %>

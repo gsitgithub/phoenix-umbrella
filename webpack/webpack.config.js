@@ -18,7 +18,7 @@ module.exports = {
         bookmarker: pathHelpers.defaultEntrypointForApp('bookmarker'),
         movielist: pathHelpers.defaultEntrypointForApp('movielist'),
         grenadier: pathHelpers.defaultEntrypointForApp('grenadier'),
-        blockquote: `${__dirname}/../apps/blockquote/assets/sass/admin.scss`,
+        blockquote: pathHelpers.defaultEntrypointForApp('blockquote'),
         artour_admin: `${__dirname}/../apps/artour/assets/js/admin/index.js`,
         artour_public: `${__dirname}/../apps/artour/assets/js/public/index.js`,
         startpage_admin: `${__dirname}/../apps/startpage/assets/js/admin/index.js`,
@@ -36,19 +36,41 @@ module.exports = {
     },
     resolve: {
         alias: {
-            'umbrella-common-js': path.resolve(__dirname, '../apps/common/assets/js/'),
-            bootstrap: path.resolve(__dirname, '../node_modules/bootstrap/scss'),
-            'chartist-styles': path.resolve(__dirname, '../node_modules/chartist/dist/index.scss'),
-            'photog-styles': path.resolve(__dirname, '../apps/photog/assets/sass/'),
-            'artour-styles': path.resolve(__dirname, '../apps/artour/assets/css/'),
-            'seren-styles': path.resolve(__dirname, '../apps/seren/assets/sass/'),
+            'umbrella-common-js': path.resolve(
+                __dirname,
+                '../apps/common/assets/js/'
+            ),
+            'umbrella-common-styles': path.resolve(
+                __dirname,
+                '../apps/common/assets/css/'
+            ),
+            bootstrap: path.resolve(
+                __dirname,
+                '../node_modules/bootstrap/scss'
+            ),
+            'chartist-styles': path.resolve(
+                __dirname,
+                '../node_modules/chartist/dist/index.scss'
+            ),
+            'photog-styles': path.resolve(
+                __dirname,
+                '../apps/photog/assets/sass/'
+            ),
+            'artour-styles': path.resolve(
+                __dirname,
+                '../apps/artour/assets/css/'
+            ),
+            'seren-styles': path.resolve(
+                __dirname,
+                '../apps/seren/assets/sass/'
+            ),
         },
     },
     module: {
         rules: [
             {
                 test: /\.vue$/,
-                loader: 'vue-loader'
+                loader: 'vue-loader',
             },
             {
                 test: /\.scss$/,
@@ -64,14 +86,15 @@ module.exports = {
                                     url: false,
                                     esModule: false,
                                     modules: {
-                                        localIdentName: '[local]_[hash:base64:8]',
+                                        localIdentName:
+                                            '[local]_[hash:base64:8]',
                                     },
-                                }
+                                },
                             },
                             {
                                 loader: 'sass-loader',
                             },
-                        ]
+                        ],
                     },
                     {
                         use: [
@@ -90,11 +113,11 @@ module.exports = {
                                 },
                             },
                             'sass-loader',
-                        ]
+                        ],
                     },
                 ],
             },
-        ]
+        ],
     },
     plugins: [
         new VueLoaderPlugin(),
@@ -121,16 +144,46 @@ module.exports = {
         new FileManagerPlugin({
             events: {
                 onEnd: {
-                  copy: [
-                    { 
-                        source: path.join(__dirname, '..', 'apps', 'assets', 'image-editor.js'), 
-                        destination: path.join(__dirname, '..', 'apps', 'photog', 'priv', 'static', 'assets', 'image-editor.js') 
-                    },
-                    { 
-                        source: path.join(__dirname, '..', 'apps', 'assets', 'photog-editor-worker.js'), 
-                        destination: path.join(__dirname, '..', 'apps', 'photog', 'priv', 'static', 'assets', 'photog-editor-worker.js') 
-                    },
-                  ],
+                    copy: [
+                        {
+                            source: path.join(
+                                __dirname,
+                                '..',
+                                'apps',
+                                'assets',
+                                'image-editor.js'
+                            ),
+                            destination: path.join(
+                                __dirname,
+                                '..',
+                                'apps',
+                                'photog',
+                                'priv',
+                                'static',
+                                'assets',
+                                'image-editor.js'
+                            ),
+                        },
+                        {
+                            source: path.join(
+                                __dirname,
+                                '..',
+                                'apps',
+                                'assets',
+                                'photog-editor-worker.js'
+                            ),
+                            destination: path.join(
+                                __dirname,
+                                '..',
+                                'apps',
+                                'photog',
+                                'priv',
+                                'static',
+                                'assets',
+                                'photog-editor-worker.js'
+                            ),
+                        },
+                    ],
                 },
             },
         }),
